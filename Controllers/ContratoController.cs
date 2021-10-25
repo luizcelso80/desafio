@@ -46,6 +46,7 @@ namespace desafioConcilig.Controllers
         // GET: Contrato/Create
         public IActionResult Create()
         {
+            ViewData["Produtoid"] = new SelectList(_context.Produto, "id", "descricao");
             return View();
         }
 
