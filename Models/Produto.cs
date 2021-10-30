@@ -11,7 +11,7 @@ namespace concilig.Models
     {
         [Key]
         public int id { get; set; }
-        [Display(Name = "Descrição")]
+        [Display(Name = "Produto")]
         public string descricao { get; set; }
 
         public ICollection<Contrato> Contratos {get; set;}

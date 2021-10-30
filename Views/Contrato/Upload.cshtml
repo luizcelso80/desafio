@@ -1,18 +1,25 @@
-@model concilig.Models.Contrato
+@model desafioConcilig.Models.Importacao
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Upload";
 }
 
-<h1>Create</h1>
+<h1>Nova importação</h1>
 
-<h4>Contrato</h4>
+<h4>Arquivo csv</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Upload" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="importacao" class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                    <p>Selecione o csv</p>
+                    <input type="file" name="files" accept="image/*">
+                </div>
+            </div>
+            @* <div class="form-group">
                 <label asp-for="Cliente.nome" class="control-label"></label>
                 <select asp-for="Cliente" class="form-control" asp-items="ViewBag.Clientes">
                     <option value="">-- Selecione o Cliente --</option>
@@ -38,16 +45,16 @@
                 <label asp-for="dataVencimento" class="control-label"></label>
                 <input asp-for="dataVencimento" class="form-control" />
                 <span asp-validation-for="dataVencimento" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Importar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Voltar</a>
 </div>
 
 @section Scripts {

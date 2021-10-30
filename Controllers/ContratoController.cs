@@ -7,6 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using concilig.Models;
 using desafioConcilig.Data;
+using LumenWorks.Framework.IO.Csv;
+using Microsoft.AspNetCore.Http;
+
+
+
 
 namespace desafioConcilig.Controllers
 {
@@ -22,7 +27,27 @@ namespace desafioConcilig.Controllers
         // GET: Contrato
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Contrato.ToListAsync());
+            var contratos = await _context.Contrato
+                .Include(c => c.Cliente)
+                .Include(p => p.Produto)
+                
+                .AsNoTracking()
+
+                .ToListAsync();
+            //return View(await _context.Contrato.ToListAsync());
+            return View(contratos);
+        }
+
+        public IActionResult Upload()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public Task<IActionResult> Upload(IFormFile file)
+        {
+            return View();
         }
 
         // GET: Contrato/Details/5
@@ -46,7 +71,8 @@ namespace desafioConcilig.Controllers
         // GET: Contrato/Create
         public IActionResult Create()
         {
-            ViewData["Produtoid"] = new SelectList(_context.Produto, "id", "descricao");
+            ViewData["Produtos"] = new SelectList(_context.Produto, "id", "descricao");
+            ViewData["Clientes"] = new SelectList(_context.Cliente, "id", "nome");
             return View();
         }
 
@@ -55,10 +81,12 @@ namespace desafioConcilig.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,referencia,valor,dataVencimento")] Contrato contrato)
+        public async Task<IActionResult> Create([Bind("id,referencia,valor,dataVencimento")] Contrato contrato, int Cliente, int Produto)
         {
             if (ModelState.IsValid)
             {
+                contrato.Cliente = await _context.Cliente.FindAsync(Cliente);
+                contrato.Produto = await _context.Produto.FindAsync(Produto);
                 _context.Add(contrato);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -74,11 +102,17 @@ namespace desafioConcilig.Controllers
                 return NotFound();
             }
 
-            var contrato = await _context.Contrato.FindAsync(id);
+            var contrato = await _context.Contrato
+                .Include(c => c.Cliente)
+                .Include(p => p.Produto)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.id == id);
             if (contrato == null)
             {
                 return NotFound();
             }
+            ViewData["Clientes"] = new SelectList(_context.Cliente, "id", "nome", contrato.Cliente.id);
+            ViewData["Produtos"] = new SelectList(_context.Produto, "id", "descricao", contrato.Produto.id);
             return View(contrato);
         }
 
@@ -87,7 +121,7 @@ namespace desafioConcilig.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,referencia,valor,dataVencimento")] Contrato contrato)
+        public async Task<IActionResult> Edit(int id, [Bind("id,referencia,valor,dataVencimento")] Contrato contrato, int cliente_id, int produto_id)
         {
             if (id != contrato.id)
             {
@@ -98,6 +132,11 @@ namespace desafioConcilig.Controllers
             {
                 try
                 {
+                    //contrato = await _context.Contrato.FindAsync(id);
+                    
+                    contrato.Cliente = await _context.Cliente.FindAsync(cliente_id);
+                    contrato.Produto = await _context.Produto.FindAsync(produto_id);
+                  
                     _context.Update(contrato);
                     await _context.SaveChangesAsync();
                 }
@@ -145,6 +184,9 @@ namespace desafioConcilig.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
+     
 
         private bool ContratoExists(int id)
         {

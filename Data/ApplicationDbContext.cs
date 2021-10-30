@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using concilig.Models;
+using desafioConcilig.Models;
 
 namespace desafioConcilig.Data
 {
@@ -16,5 +17,6 @@ namespace desafioConcilig.Data
         public DbSet<Cliente> Cliente { get; set; }
         public DbSet<concilig.Models.Produto> Produto { get; set; }
         public DbSet<concilig.Models.Contrato> Contrato { get; set; }
+        
     }
 }
